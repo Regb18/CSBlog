@@ -63,6 +63,8 @@ namespace CSBlog.Controllers
         {
             if (ModelState.IsValid)
             {
+                comment.Created = DateTime.UtcNow;
+
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -106,6 +108,8 @@ namespace CSBlog.Controllers
             {
                 try
                 {
+                    comment.Created = DateTime.SpecifyKind(comment.Created, DateTimeKind.Utc);
+
                     _context.Update(comment);
                     await _context.SaveChangesAsync();
                 }

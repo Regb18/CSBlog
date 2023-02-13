@@ -7,26 +7,51 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CSBlog.Data;
 using CSBlog.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using CSBlog.Services.Interfaces;
+using CSAddressBook.Services;
 
 namespace CSBlog.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class BlogPostsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<BlogUser> _userManager;
+        private readonly IBlogService _blogService;
+        private readonly IImageService _imageService;
 
-        public BlogPostsController(ApplicationDbContext context)
+        public BlogPostsController(ApplicationDbContext context, 
+                                   UserManager<BlogUser> userManager, 
+                                   IBlogService blogService,
+                                   IImageService imageService)
         {
             _context = context;
+            _userManager = userManager;
+            _blogService = blogService;
+            _imageService = imageService;
         }
 
         // GET: BlogPosts
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.BlogPosts.Include(b => b.Category);
-            return View(await applicationDbContext.ToListAsync());
+            string userId = _userManager.GetUserId(User)!;
+
+            List<BlogPost> blogPosts = new List<BlogPost>();
+
+            // include isPublished == true, isDeleted == false
+            blogPosts = await _context.BlogPosts
+                                      .Include(c => c.Category)
+                                      .Include(c => c.Tags)
+                                      .ToListAsync();
+
+            return View(blogPosts);
         }
 
         // GET: BlogPosts/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.BlogPosts == null)
@@ -46,9 +71,17 @@ namespace CSBlog.Controllers
         }
 
         // GET: BlogPosts/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            IEnumerable<Category> categoryList = await _context.Categories                                         
+                                                               .ToListAsync();
+
+            IEnumerable<Tag> tagsList = await _context.Tags
+                                                      .ToListAsync();
+
+
+            ViewData["CategoryList"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["TagList"] = new MultiSelectList(_context.Tags, "Id", "Name");
             return View();
         }
 
@@ -57,15 +90,34 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageData,ImageType,CategoryId")] BlogPost blogPost)
+        public async Task<IActionResult> Create([Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageFile,ImageData,ImageType,CategoryId")] BlogPost blogPost, IEnumerable<int> selected)
         {
             if (ModelState.IsValid)
             {
+                // TODO: Image Service
+
+
+                blogPost.Created = DataUtility.GetPostGresDate(DateTime.UtcNow);
+
+                if (blogPost.ImageFile != null)
+                {
+                    blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
+                    blogPost.ImageType = blogPost.ImageFile.ContentType;
+                }
+
                 _context.Add(blogPost);
                 await _context.SaveChangesAsync();
+
+                // TODO: Add Service Call 
+                // DONE
+
+                await _blogService.AddBlogPostToTagsAsync(selected, blogPost.Id);
+
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", blogPost.CategoryId);
+
+            ViewData["CategoryList"] = new SelectList(_context.Categories, "Id", "Name");
             return View(blogPost);
         }
 
@@ -77,7 +129,21 @@ namespace CSBlog.Controllers
                 return NotFound();
             }
 
-            var blogPost = await _context.BlogPosts.FindAsync(id);
+            var blogPost = await _context.BlogPosts
+                                         .Include(c => c.Category)
+                                         .Include(c => c.Tags)
+                                         .FirstOrDefaultAsync(c => c.Id == id);
+
+
+            IEnumerable<Category> categoryList = await _context.Categories
+                                                   .ToListAsync();
+
+            IEnumerable<Tag> tagsList = await _context.Tags
+                                                      .ToListAsync();
+            IEnumerable<int> currentTag = blogPost!.Tags.Select(c => c.Id);
+
+            ViewData["TagList"] = new MultiSelectList(_context.Tags, "Id", "Name", currentTag);
+
             if (blogPost == null)
             {
                 return NotFound();
@@ -91,7 +157,7 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageData,ImageType,CategoryId")] BlogPost blogPost)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageData,ImageType,CategoryId")] BlogPost blogPost, IEnumerable<int> selected)
         {
             if (id != blogPost.Id)
             {
@@ -102,8 +168,27 @@ namespace CSBlog.Controllers
             {
                 try
                 {
+                    blogPost.Created = DataUtility.GetPostGresDate(blogPost.Created);
+                    blogPost.Updated = DataUtility.GetPostGresDate(DateTime.UtcNow);
+
+                    if (blogPost.ImageFile != null)
+                    {
+                        blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
+                        blogPost.ImageType = blogPost.ImageFile.ContentType;
+                    }
+
+
                     _context.Update(blogPost);
                     await _context.SaveChangesAsync();
+
+
+                    if(selected != null)
+                    {
+                    await _blogService.RemoveAllBlogPostTagsAsync(blogPost.Id);
+
+                    await _blogService.AddBlogPostToTagsAsync(selected, blogPost.Id);
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {

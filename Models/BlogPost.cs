@@ -42,9 +42,12 @@ namespace CSBlog.Models
         public virtual IFormFile? ImageFile { get; set; }
 
         // navigation properties
+
+        // foreign key Many-to-1 - 1 category can have many blog posts
         public int CategoryId { get; set; }
         public virtual Category? Category { get; set; }
         
+        // 1-to-Many 1 Blog post can have many tags and many comments
         public virtual ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
         public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
 
