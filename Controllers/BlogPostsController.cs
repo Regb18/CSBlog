@@ -50,6 +50,18 @@ namespace CSBlog.Controllers
             return View(blogPosts);
         }
 
+        public async Task<IActionResult> AdminPage()
+        {
+            // include isPublished == true, isDeleted == false
+            var blogPosts = await _context.BlogPosts
+                                      .Include(c => c.Category)
+                                      .Include(c => c.Tags)
+                                      .ToListAsync();
+
+            return View(blogPosts);
+        }
+
+
         // GET: BlogPosts/Details/5
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
