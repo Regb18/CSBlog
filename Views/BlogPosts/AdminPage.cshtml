@@ -1,5 +1,11 @@
 ﻿@model IEnumerable<CSBlog.Models.BlogPost>
 
+@using CSBlog.Enums;
+@using CSBlog.Services.Interfaces
+
+@*only need the representation of the methods, lighter than the service*@
+@inject IImageService _ImageService
+
 
 <div class="axil-post-list-area axil-section-gap bg-color-white">
     <div class="container">
@@ -16,7 +22,7 @@
                     <div class="content-block post-list-view mt--30">
                         <div class="post-thumbnail">
                             <a asp-controller="BlogPosts" asp-action="Details" asp-route-slug="@blogPost.Slug">
-                                <img src="" alt="Post Images" />
+                                <img src="@_ImageService.ConvertByteArrayToFile(blogPost.ImageData!, blogPost.ImageType!,(int)DefaultImage.BlogPostImage)" alt="Post Images" />
                             </a>
                         </div>
                         <div class="post-content">
@@ -30,6 +36,7 @@
                                 </div>
                             </div>
                             <h4 class="title">
+                                @*Slug will take us to the id instead of asp-route-id*@
                                 <a asp-controller="BlogPosts" asp-action="Details" asp-route-slug="@blogPost.Slug">
                                     @blogPost.Title
                                 </a>
@@ -40,7 +47,7 @@
                                         <h6 class="post-author-name">
                                             <a class="hover-flip-item-wrapper" href="author.html">
                                                 <span class="hover-flip-item">
-                                                    <span data-text="Antonio Raynor">Antonio Raynor</span>
+                                                    <span data-text="Reggie Barnes">Reggie Barnes</span>
                                                 </span>
                                             </a>
                                         </h6>

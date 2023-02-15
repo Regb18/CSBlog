@@ -3,7 +3,7 @@ using CSBlog.Models;
 using CSBlog.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace CSAddressBook.Services
+namespace CSBlog.Services
 {
     public class BlogService : IBlogService
     {

@@ -10,7 +10,7 @@ using CSBlog.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using CSBlog.Services.Interfaces;
-using CSAddressBook.Services;
+using CSBlog.Services;
 
 namespace CSBlog.Controllers
 {
@@ -94,7 +94,7 @@ namespace CSBlog.Controllers
 
             ViewData["CategoryList"] = new SelectList(_context.Categories, "Id", "Name");
             ViewData["TagList"] = new MultiSelectList(_context.Tags, "Id", "Name");
-            return View();
+            return View(new BlogPost());
         }
 
         // POST: BlogPosts/Create
@@ -160,7 +160,7 @@ namespace CSBlog.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", blogPost.CategoryId);
+            ViewData["CategoryList"] = new SelectList(_context.Categories, "Id", "Name", blogPost.CategoryId);
             return View(blogPost);
         }
 

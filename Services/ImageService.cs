@@ -1,22 +1,32 @@
 ﻿using CSBlog.Services.Interfaces;
 using System.Drawing.Text;
 
-namespace CSAddressBook.Services
+namespace CSBlog.Services
 {
     public class ImageService : IImageService
     {
-        private readonly string defualtImage = "/img/DefaultContactImage.png";
-        public string ConvertByteArrayToFile(byte[] fileData, string extension)
+        // default blog, category, and user
+        private readonly string _defualtUserImage = "/img/DefaultUserImage.png";
+        private readonly string _defualtBlogImage = "/img/DefaultBlogImage.png";
+        private readonly string _defualtCategoryImage = "/img/DefaultCategoryImage.png";
+        
+        
+        public string ConvertByteArrayToFile(byte[] fileData, string extension, int defaultImage)
         {
-            if (fileData == null)
+            if (fileData == null || fileData.Length == 0)
             {
-                return defualtImage;
+                switch (defaultImage)
+                {
+                    case 1: return _defualtUserImage;
+                    case 2: return _defualtBlogImage;
+                    case 3: return _defualtCategoryImage;
+                }
             }
 
 
             try
             {
-                string imageBase64Data = Convert.ToBase64String(fileData);
+                string imageBase64Data = Convert.ToBase64String(fileData!);
                 imageBase64Data = string.Format($"data:{extension};base64,{imageBase64Data}");
 
                 return imageBase64Data;

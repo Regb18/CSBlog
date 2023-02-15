@@ -1,4 +1,4 @@
-using CSAddressBook.Services;
+using CSBlog.Services;
 using CSBlog.Data;
 using CSBlog.Models;
 using CSBlog.Services.Interfaces;
@@ -20,7 +20,7 @@ builder.Services.AddIdentity<BlogUser, IdentityRole>(options => options.SignIn.R
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-
+// Custom Services
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 
