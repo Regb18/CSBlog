@@ -7,37 +7,36 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CSBlog.Data;
 using CSBlog.Models;
+using CSBlog.Services;
+using CSBlog.Services.Interfaces;
 
 namespace CSBlog.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public CommentsController(ApplicationDbContext context)
+        private readonly IBlogPostService _blogPostService;
+        public CommentsController(IBlogPostService blogPostService)
         {
-            _context = context;
+            _blogPostService = blogPostService;
         }
 
         // GET: Comments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.BlogPost);
-            return View(await applicationDbContext.ToListAsync());
+            var comments = await _blogPostService.GetCommentsAsync();
+            return View(comments);
         }
 
         // GET: Comments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Comments == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.BlogPost)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _blogPostService.GetCommentAsync(id.Value);
+
             if (comment == null)
             {
                 return NotFound();
@@ -47,10 +46,11 @@ namespace CSBlog.Controllers
         }
 
         // GET: Comments/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content");
+            // Automatically assign author to Author ID           
+            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content");
             return View();
         }
 
@@ -65,30 +65,33 @@ namespace CSBlog.Controllers
             {
                 comment.Created = DateTime.UtcNow;
 
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                await _blogPostService.AddCommentAsync(comment);
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content", comment.BlogPostId);
+            // Automatically assign author to Author ID
+            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
             return View(comment);
         }
 
         // GET: Comments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Comments == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _blogPostService.GetCommentAsync(id.Value);
+
             if (comment == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content", comment.BlogPostId);
+            // Automatically assign author to Author ID
+            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
             return View(comment);
         }
 
@@ -110,12 +113,11 @@ namespace CSBlog.Controllers
                 {
                     comment.Created = DateTime.SpecifyKind(comment.Created, DateTimeKind.Utc);
 
-                    _context.Update(comment);
-                    await _context.SaveChangesAsync();
+                    await _blogPostService.UpdateCommentAsync(comment);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.Id))
+                    if (!await CommentExists(comment.Id))
                     {
                         return NotFound();
                     }
@@ -126,23 +128,22 @@ namespace CSBlog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(_context.BlogPosts, "Id", "Content", comment.BlogPostId);
+            // Automatically assign author to Author ID
+            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
             return View(comment);
         }
 
         // GET: Comments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Comments == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.BlogPost)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _blogPostService.GetCommentAsync(id.Value);
+
             if (comment == null)
             {
                 return NotFound();
@@ -156,23 +157,24 @@ namespace CSBlog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Comments == null)
+            if (id == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Comments'  is null.");
+                return NotFound();
             }
-            var comment = await _context.Comments.FindAsync(id);
+
+            var comment = await _blogPostService.GetCommentAsync(id);
+            
             if (comment != null)
             {
-                _context.Comments.Remove(comment);
+                await _blogPostService.DeleteCommentAsync(comment);
             }
             
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CommentExists(int id)
+        private async Task<bool> CommentExists(int id)
         {
-          return (_context.Comments?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (await _blogPostService.GetCommentsAsync()).Any(e => e.Id == id);
         }
     }
 }

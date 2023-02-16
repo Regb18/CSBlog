@@ -1,5 +1,12 @@
 ﻿@model IEnumerable<CSBlog.Models.BlogPost>
 
+@using CSBlog.Enums;
+@using CSBlog.Services.Interfaces
+
+@*only need the representation of the methods, lighter than the service*@
+@inject IImageService _ImageService
+
+
 <!-- Start Author Area  -->
 <div class="axil-author-area axil-author-banner bg-color-grey">
     <div class="container">
@@ -53,7 +60,7 @@
                     <div class="content-block post-list-view mt--30">
                         <div class="post-thumbnail">
                             <a href="post-details.html">
-                                <img src="~/assets/images/post-images/post-list-02.jpg" alt="Post Images">
+                                <img src="@_ImageService.ConvertByteArrayToFile(blogPost.ImageData!, blogPost.ImageType!,(int)DefaultImage.BlogPostImage)" alt="Post Images" />
                             </a>
                         </div>
                         <div class="post-content">
