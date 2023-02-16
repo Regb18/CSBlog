@@ -92,6 +92,13 @@
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Comments)
         </dt>
+@*        <div class="col-lg-8 col-md-8 col-12">
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control editor"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+        </div>*@
         <dd class="col-sm-10">
             <ul>
                 @foreach (Comment comment in Model.Comments)
@@ -108,3 +115,28 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="AdminPage">Back to List</a>
 </div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/ckeditor5/build/ckeditor.js"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('.editor'), {
+                licenseKey: '',
+            })
+            .then(editor => {
+                window.editor = editor;
+            })
+            .catch(error => {
+                console.error('Oops, something went wrong!');
+                console.error('Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:');
+                console.warn('Build id: xx09iayzufkn-lkt434h3lx2z');
+                console.error(error);
+            });
+    </script>
+}

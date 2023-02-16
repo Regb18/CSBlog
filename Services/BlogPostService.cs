@@ -1,5 +1,6 @@
 ﻿using Azure;
 using CSBlog.Data;
+using CSBlog.Helpers;
 using CSBlog.Models;
 using CSBlog.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,10 @@ namespace CSBlog.Services
     public class BlogPostService : IBlogPostService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IImageService _imageService;
 
-        public BlogPostService(ApplicationDbContext context, IImageService imageService)
+        public BlogPostService(ApplicationDbContext context)
         {
             _context = context;
-            _imageService = imageService;
         }
 
         #region BlogPost CRUD Methods
@@ -63,23 +62,38 @@ namespace CSBlog.Services
 
         public async Task<BlogPost> GetBlogPostAsync(int blogPostId)
         {
-
             try
             {
                 BlogPost? blogPost = await _context.BlogPosts
-                                                  .Include(b => b.Category)
-                                                  .Include(b => b.Tags)
-                                                  .Include(b => b.Comments)
-                                                  .FirstOrDefaultAsync(b => b.Id == blogPostId);
+                                                   .Include(b => b.Category)
+                                                   .Include(b => b.Tags)
+                                                   .Include(b => b.Comments)
+                                                   .FirstOrDefaultAsync(b => b.Id == blogPostId);
 
                 return blogPost!;
             }
             catch (Exception)
             {
-
                 throw;
             }
+        }
 
+        public async Task<BlogPost> GetBlogPostAsync(string slug)
+        {
+            try
+            {
+                BlogPost? blogPost = await _context.BlogPosts
+                                                   .Include(b => b.Category)
+                                                   .Include(b => b.Tags)
+                                                   .Include(b => b.Comments)
+                                                   .FirstOrDefaultAsync(b => b.Slug == slug);
+
+                return blogPost!;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
         #endregion
 
@@ -477,9 +491,39 @@ namespace CSBlog.Services
         {
             throw new NotImplementedException();
         }
-        public Task<bool> ValidateSlugAsync(string title, int blogPostId)
+        public async Task<bool> ValidateSlugAsync(string title, int blogPostId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string newSlug = StringHelper.BlogSlug(title);
+
+                if(blogPostId == 0)
+                {
+                    // AnyAsync - checking the database to see if theres a matching slug
+                    return !await _context.BlogPosts.AnyAsync(b => b.Slug == newSlug);
+                }
+                else
+                {
+                    // ORM (entity framework for us) tracks the data, AsNoTracking stops ORM from tracking, we just need the values
+                    // Entity framework stops us from finding and accessing an instantiation with something ekse
+                    BlogPost? blogPost = await _context.BlogPosts.AsNoTracking().FirstOrDefaultAsync(b => b.Id == blogPostId);
+
+                    string? oldSlug = blogPost?.Slug;
+
+                    // another way to compare strings 
+                    if(!string.Equals(oldSlug, newSlug))
+                    {
+                        return !await _context.BlogPosts.AnyAsync(b => b.Id != blogPost!.Id && b.Slug == newSlug);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         #endregion
 

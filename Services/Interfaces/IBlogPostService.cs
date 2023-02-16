@@ -9,7 +9,20 @@ namespace CSBlog.Services.Interfaces
         #region BlogPost CRUD Methods
         public Task AddBlogPostAsync(BlogPost blogPost);
         public Task UpdateBlogPostAsync(BlogPost blogPost);
+
+        /// <summary>
+        /// Get a single BlogPost by Id (integer)
+        /// </summary>
+        /// <param name="blogPostId"></param>
+        /// <returns></returns>
         public Task<BlogPost> GetBlogPostAsync(int blogPostId);
+
+        /// <summary>
+        /// Gets a single BlogPost by Slug (string)
+        /// </summary>
+        /// <param name="slug"></param>
+        /// <returns></returns>
+        public Task<BlogPost> GetBlogPostAsync(string slug);
         public Task DeleteBlogPostAsync(BlogPost blogPost);
         #endregion
 

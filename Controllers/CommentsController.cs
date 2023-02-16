@@ -71,7 +71,7 @@ namespace CSBlog.Controllers
             }
             // Automatically assign author to Author ID
             //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
+            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Title", comment.BlogPostId);
             return View(comment);
         }
 

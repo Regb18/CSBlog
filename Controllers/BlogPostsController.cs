@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using CSBlog.Services.Interfaces;
 using CSBlog.Services;
+using CSBlog.Helpers;
 
 namespace CSBlog.Controllers
 {
@@ -38,14 +39,14 @@ namespace CSBlog.Controllers
 
         // GET: BlogPosts/Details/5
         [AllowAnonymous]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string? slug)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(slug))
             {
                 return NotFound();
             }
-                                                                // Value matches up to a nullable int
-            var blogPost = await _blogPostService.GetBlogPostAsync(id.Value);
+            
+            var blogPost = await _blogPostService.GetBlogPostAsync(slug);
 
             if (blogPost == null)
             {
@@ -73,7 +74,17 @@ namespace CSBlog.Controllers
         {
             if (ModelState.IsValid)
             {
-                // TODO: Image Service
+                // Slug BlogPost
+
+                if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!, blogPost.Id)) 
+                {
+                    ModelState.AddModelError("Title", "A similar Title or Slug is already in use.");
+
+                    ViewData["CategoryList"] = new SelectList(await _blogPostService.GetCategoriesAsync(), "Id", "Name");
+                    return View(blogPost);
+                }
+
+                blogPost.Slug = StringHelper.BlogSlug(blogPost.Title!);
 
 
                 blogPost.Created = DataUtility.GetPostGresDate(DateTime.UtcNow);
@@ -83,11 +94,9 @@ namespace CSBlog.Controllers
                     blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
                     blogPost.ImageType = blogPost.ImageFile.ContentType;
                 }
-
                 await _blogPostService.AddBlogPostAsync(blogPost);
 
-                // TODO: Add Service Call 
-                // DONE
+                // Service Call 
 
                 await _blogPostService.AddBlogPostToTagsAsync(selected, blogPost.Id);
 
@@ -145,6 +154,17 @@ namespace CSBlog.Controllers
                         blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
                         blogPost.ImageType = blogPost.ImageFile.ContentType;
                     }
+
+                    // Slug BlogPost
+
+                    if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!, blogPost.Id))
+                    {
+                        ModelState.AddModelError("Title", "A similar Title or Slug is already in use.");
+
+                        ViewData["CategoryList"] = new SelectList(await _blogPostService.GetCategoriesAsync(), "Id", "Name");
+                        return View(blogPost);
+                    }
+                    blogPost.Slug = StringHelper.BlogSlug(blogPost.Title!);
 
 
                     await _blogPostService.UpdateBlogPostAsync(blogPost);

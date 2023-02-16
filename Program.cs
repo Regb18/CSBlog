@@ -52,6 +52,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "custom",
+    // slug has to match name of parameter on details 
+    pattern: "Content/{slug}",
+    defaults: new { controller = "BlogPosts", action = "Details"});
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();

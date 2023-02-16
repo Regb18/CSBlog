@@ -25,7 +25,8 @@ namespace CSBlog.Models
         [DataType(DataType.Date)]
         public DateTime? Updated { get; set; }
 
-        // TODO: make this required
+        // make this required
+        [Required]
         public string? Slug { get; set; }
 
         [Display(Name = "Deleted?")]
