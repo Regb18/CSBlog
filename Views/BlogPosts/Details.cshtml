@@ -1,5 +1,11 @@
 ﻿@model CSBlog.Models.BlogPost
 
+@using CSBlog.Enums;
+@using CSBlog.Services.Interfaces
+
+@*only need the representation of the methods, lighter than the service*@
+@inject IImageService _ImageService
+@inject IBlogPostService _BlogPostService
 @{
     ViewData["Title"] = "Details";
 }
@@ -92,18 +98,23 @@
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Comments)
         </dt>
+        @*TODO: Submit Comment*@
 @*        <div class="col-lg-8 col-md-8 col-12">
-            <div class="form-group">
-                <label asp-for="Comments" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control editor"></textarea>
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
+            <form asp-action="Details">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Body" class="control-label"></label>
+                    <input asp-for="Body" class="form-control editor" />
+                    <span asp-validation-for="Body" class="text-danger"></span>
+                </div>
+            </form>
         </div>*@
         <dd class="col-sm-10">
             <ul>
                 @foreach (Comment comment in Model.Comments)
                 {
                     <li>
+                        <h4>@comment.Author</h4>
                         @comment.Body
                     </li>
                 }

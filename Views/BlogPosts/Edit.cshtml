@@ -15,107 +15,72 @@
 <h4>BlogPost</h4>
 <hr />
 
-<div class="post-single-wrapper axil-section-gap bg-color-white">
-    <div class="container">
+<main class="container mt-5">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Created" />
+    <input type="hidden" asp-for="ImageData" />
+    <input type="hidden" asp-for="ImageType" />
+    <input type="hidden" asp-for="Slug" />
+    <input type="hidden" asp-for="IsDeleted" />
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="row">
-            <form asp-action="Edit" enctype="multipart/form-data">
-                <div class="col-md-10">
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="Created" />
-                    <input type="hidden" asp-for="ImageData" />
-                    <input type="hidden" asp-for="ImageType" />
-                    <input type="hidden" asp-for="Slug" />
-                    <input type="hidden" asp-for="IsDeleted" />
-
-                    <!-- Start Blog Details  -->
-                    <div class="axil-post-details">
-                        <h4 class="title">Edit a BlogPost</h4>
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <p class="comment-notes">
-                            <span id="email-notes">
-                                Edit blog using the following fields.
-                            </span> Required items are marked <span class="required">*</span>
-                        </p>
-                        <div class="row row-cols-10">
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <label asp-for="Category" class="control-label"></label>
-                                    <br />
-                                    <select class="w-100" asp-for="CategoryId" asp-items="ViewBag.CategoryList"></select>
-                                    <span asp-validation-for="Category" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <label asp-for="Title" class="control-label"></label>
-                                    <input asp-for="Title" class="form-control" />
-                                    <span asp-validation-for="Title" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <label asp-for="Abstract" class="control-label"></label>
-                                    <textarea asp-for="Abstract" class="form-control"></textarea>
-                                    <span asp-validation-for="Abstract" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <label asp-for="Tags" class="control-label"></label>
-                                    <select name="Selected" class="form-control" asp-items="ViewBag.TagList" multiple></select>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-12">
-                                <div class="form-group">
-                                    <label asp-for="ImageFile" class="control-label"></label>
-                                    <input type="file" asp-for="ImageFile" class="form-control w-100" accept=".png,.jpg,.jpeg,.gif,.svg"
-                                           onchange="document.getElementById('imageData').src = window.URL.createObjectURL(this.files[0])" />
-                                    <span asp-validation-for="ImageFile" class="text-danger"></span>
-                                </div>
-                                <div class="post-thumbnail">
-                                    <img id="imageData" src="@_ImageService.ConvertByteArrayToFile(Model.ImageData!,Model.ImageType!,(int)DefaultImage.BlogPostImage)" alt="Post Images" />
-                                </div>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <label asp-for="Content" class="control-label"></label>
-                                    <textarea asp-for="Content" class="form-control editor"></textarea>
-                                    <span asp-validation-for="Content" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-12">
-                                <div class="form-group">
-                                    <input class="" type="checkbox" asp-for="IsPublished" />
-                                    <label class="control-label" asp-for="IsPublished">Publish</label>
-                                    <span asp-validation-for="IsPublished" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="form-submit cerchio">
-                                    <input name="submit" type="submit" id="submit" class="axil-button button-rounded" value="Submit">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-12 col-lg-4">
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
-                <div class="col-md-2">
-                    <div class="axil-post-details">
-                    </div>
+                <div class="form-group">
+                    <label asp-for="Abstract" class="control-label"></label>
+                    <textarea asp-for="Abstract" class="form-control" rows="1"></textarea>
+                    <span asp-validation-for="Abstract" class="text-danger"></span>
                 </div>
-            </form>
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label">Category</label>
+                    <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryList"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ImageFile" class="control-label">Blog Post Image</label>
+                    <img class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_ImageService.ConvertByteArrayToFile(Model.ImageData!, Model.ImageType!,(int)DefaultImage.BlogPostImage)" id="blogImage">
+                    <input asp-for="ImageFile" type="file" class="form-control mt-3 pt-2" accept=".png,.jpg,.jpeg,.gif"
+                           onchange="document.getElementById('blogImage').src = window.URL.createObjectURL(this.files[0])" />
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="ck-editor__editable_inline form-group">
+                    <label asp-for="Content" class="control-label"></label>
+                    <textarea asp-for="Content" class="editor form-control"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                <div class="form-group" id="tagContainer">
+                    <label asp-for="Tags"></label>
+                    <input class="form-control" type="text" id="tagInput" name="StringTags" value="@ViewBag.TagList" autocomplete="off" />
+                </div>
+            </div>
         </div>
+        <div class="form-group d-flex justify-content-end mt-3">
+            <div class="form-group form-check d-flex my-auto">
+                <label class="form-check-label my-auto me-4">
+                    <input class="form-check-input me-3" asp-for="IsPublished" />&nbsp; Publish?
+                </label>
+            </div>
+            <input type="submit" value="Edit" class="btn btn-primary" />
+        </div>
+    </form>
+    <div class="mt-5">
+        <a asp-action="AdminPage">Back to List</a>
     </div>
-</div>
+</main>
 
 
-<div>
-    <a asp-action="AdminPage">Back to List</a>
-</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
-        <script src="~/ckeditor5/build/ckeditor.js"></script>
+    <script src="~/ckeditor5/build/ckeditor.js"></script>
     <script>
         ClassicEditor
             .create(document.querySelector('.editor'), {
@@ -131,4 +96,4 @@
                 console.error(error);
             });
     </script>
-}
+    }

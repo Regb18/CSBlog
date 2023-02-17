@@ -447,6 +447,45 @@ namespace CSBlog.Services
             }
 
         }
+        public async Task AddBlogPostToTagsAsync(string stringTags, int blogPostId)
+        {
+            try
+            {
+                BlogPost? blogPost = await _context.BlogPosts.FindAsync(blogPostId);
+
+                if (blogPost == null)
+                {
+                    return;
+                }
+
+                foreach (string tagName in stringTags.Split(","))
+                {
+                    Tag? tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name.Trim().ToLower() == tagName.Trim().ToLower());
+
+                    if (tag != null)
+                    {
+                        blogPost.Tags.Add(tag);
+                    }
+                    else
+                    {
+                        Tag newTag = new Tag() { Name = tagName.Trim() };
+                        // Database knows this is a Tag so it will add it to Tags
+                        // Want to add this to the database before adding it to the blogpost
+                        _context.Add(newTag);
+
+                        blogPost.Tags.Add(newTag);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
         public async Task<bool> IsTagOnBlogPostAsync(int tagId, int blogPostId)
         {
             try
@@ -472,15 +511,16 @@ namespace CSBlog.Services
             {
                 // c represents an individual contact record in the database
                 BlogPost? blogPost = await _context.BlogPosts
-                                         .Include(c => c.Tags)
-                                         .FirstOrDefaultAsync(c => c.Id == blogPostId);
+                                         .Include(b => b.Tags)
+                                         .FirstOrDefaultAsync(b => b.Id == blogPostId);
+                if (blogPost != null)
+                {
+                    // we can do this because we used an ICollection
+                    blogPost!.Tags.Clear();
 
-                // we can do this because we used an ICollection
-                blogPost!.Tags.Clear();
-
-                _context.Update(blogPost);
-                await _context.SaveChangesAsync();
-
+                    _context.Update(blogPost);
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception)
             {
@@ -497,7 +537,7 @@ namespace CSBlog.Services
             {
                 string newSlug = StringHelper.BlogSlug(title);
 
-                if(blogPostId == 0)
+                if (blogPostId == 0)
                 {
                     // AnyAsync - checking the database to see if theres a matching slug
                     return !await _context.BlogPosts.AnyAsync(b => b.Slug == newSlug);
@@ -511,7 +551,7 @@ namespace CSBlog.Services
                     string? oldSlug = blogPost?.Slug;
 
                     // another way to compare strings 
-                    if(!string.Equals(oldSlug, newSlug))
+                    if (!string.Equals(oldSlug, newSlug))
                     {
                         return !await _context.BlogPosts.AnyAsync(b => b.Id != blogPost!.Id && b.Slug == newSlug);
                     }

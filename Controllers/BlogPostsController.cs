@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using CSBlog.Services.Interfaces;
 using CSBlog.Services;
 using CSBlog.Helpers;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace CSBlog.Controllers
 {
@@ -20,12 +21,15 @@ namespace CSBlog.Controllers
     {
         private readonly IImageService _imageService;
         private readonly IBlogPostService _blogPostService;
+        private readonly UserManager<BlogUser> _userManager;
 
         public BlogPostsController(IImageService imageService,
-                                   IBlogPostService blogPostService)
+                                   IBlogPostService blogPostService,
+                                   UserManager<BlogUser> userManager)
         {
             _imageService = imageService;
             _blogPostService = blogPostService;
+            _userManager = userManager;
         }
 
         // GET: BlogPosts
@@ -45,7 +49,7 @@ namespace CSBlog.Controllers
             {
                 return NotFound();
             }
-            
+
             var blogPost = await _blogPostService.GetBlogPostAsync(slug);
 
             if (blogPost == null)
@@ -55,6 +59,33 @@ namespace CSBlog.Controllers
 
             return View(blogPost);
         }
+
+        // TODO: Post Comment
+        // POST: Comments/Details
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Details([Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment, int blogPostId)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        string? userId = _userManager.GetUserId(User);
+
+
+        //        comment.BlogPostId = blogPostId;
+        //        comment.AuthorId = userId;
+        //        comment.Created = DateTime.UtcNow;
+
+        //        await _blogPostService.AddCommentAsync(comment);
+
+        //        return RedirectToAction(nameof(Details));
+        //    }
+        //    // Automatically assign author to Author ID
+        //    //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
+        //    //ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Title", comment.BlogPostId);
+        //    return View(comment);
+        //}
 
         // GET: BlogPosts/Create
         public async Task<IActionResult> Create()
@@ -70,13 +101,15 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageFile,ImageData,ImageType,CategoryId")] BlogPost blogPost, IEnumerable<int> selected)
+        public async Task<IActionResult> Create([Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageFile,ImageData,ImageType,CategoryId")] BlogPost blogPost, string? stringTags)
         {
+            ModelState.Remove("Slug");
+
             if (ModelState.IsValid)
             {
                 // Slug BlogPost
 
-                if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!, blogPost.Id)) 
+                if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!, blogPost.Id))
                 {
                     ModelState.AddModelError("Title", "A similar Title or Slug is already in use.");
 
@@ -98,7 +131,12 @@ namespace CSBlog.Controllers
 
                 // Service Call 
 
-                await _blogPostService.AddBlogPostToTagsAsync(selected, blogPost.Id);
+                if (!string.IsNullOrWhiteSpace(stringTags))
+                {
+                    // Add Tags to BlogPost
+                    await _blogPostService.AddBlogPostToTagsAsync(stringTags, blogPost.Id);
+                }
+
 
 
                 return RedirectToAction(nameof(AdminPage));
@@ -118,15 +156,19 @@ namespace CSBlog.Controllers
 
             var blogPost = await _blogPostService.GetBlogPostAsync(id.Value);
 
-            IEnumerable<int> currentTag = blogPost!.Tags.Select(c => c.Id);
-
-            ViewData["TagList"] = new MultiSelectList(await _blogPostService.GetTagsAsync(), "Id", "Name", currentTag);
-
             if (blogPost == null)
             {
                 return NotFound();
             }
+
+
+            IEnumerable<string> tagNames = blogPost.Tags.Select(t => t.Name!);
+            ViewData["TagList"] = string.Join(", ", tagNames);
+
+
             ViewData["CategoryList"] = new SelectList(await _blogPostService.GetCategoriesAsync(), "Id", "Name", blogPost.CategoryId);
+            
+            
             return View(blogPost);
         }
 
@@ -135,7 +177,7 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageData,ImageType,CategoryId")] BlogPost blogPost, IEnumerable<int> selected)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Abstract,Content,Created,Updated,Slug,IsDeleted,IsPublished,ImageData,ImageType,CategoryId")] BlogPost blogPost, string? stringTags)
         {
             if (id != blogPost.Id)
             {
@@ -146,17 +188,8 @@ namespace CSBlog.Controllers
             {
                 try
                 {
-                    blogPost.Created = DataUtility.GetPostGresDate(blogPost.Created);
-                    blogPost.Updated = DataUtility.GetPostGresDate(DateTime.UtcNow);
 
-                    if (blogPost.ImageFile != null)
-                    {
-                        blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
-                        blogPost.ImageType = blogPost.ImageFile.ContentType;
-                    }
-
-                    // Slug BlogPost
-
+                    // Update Slug
                     if (!await _blogPostService.ValidateSlugAsync(blogPost.Title!, blogPost.Id))
                     {
                         ModelState.AddModelError("Title", "A similar Title or Slug is already in use.");
@@ -167,14 +200,28 @@ namespace CSBlog.Controllers
                     blogPost.Slug = StringHelper.BlogSlug(blogPost.Title!);
 
 
+                    // Dates
+                    blogPost.Created = DataUtility.GetPostGresDate(blogPost.Created);
+                    blogPost.Updated = DataUtility.GetPostGresDate(DateTime.UtcNow);
+
+                    // Image Service
+                    if (blogPost.ImageFile != null)
+                    {
+                        blogPost.ImageData = await _imageService.ConvertFileToByteArrayAsync(blogPost.ImageFile);
+                        blogPost.ImageType = blogPost.ImageFile.ContentType;
+                    }
+
+                    // Update Blog
                     await _blogPostService.UpdateBlogPostAsync(blogPost);
 
 
-                    if(selected != null)
-                    {
+
+                    // Tags
                     await _blogPostService.RemoveAllBlogPostTagsAsync(blogPost.Id);
 
-                    await _blogPostService.AddBlogPostToTagsAsync(selected, blogPost.Id);
+                    if (!string.IsNullOrWhiteSpace(stringTags))
+                    {
+                        await _blogPostService.AddBlogPostToTagsAsync(stringTags, blogPost.Id);
                     }
 
                 }
@@ -224,18 +271,18 @@ namespace CSBlog.Controllers
             }
 
             var blogPost = await _blogPostService.GetBlogPostAsync(id);
-            
+
             if (blogPost != null)
             {
                 await _blogPostService.DeleteBlogPostAsync(blogPost);
             }
-            
+
             return RedirectToAction(nameof(AdminPage));
         }
 
         private async Task<bool> BlogPostExists(int id)
         {
-          return (await _blogPostService.GetBlogPostsAsync()).Any(b => b.Id == id);
+            return (await _blogPostService.GetBlogPostsAsync()).Any(b => b.Id == id);
         }
     }
 }

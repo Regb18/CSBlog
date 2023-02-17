@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="~/assets/css/plugins/plugins.css">
     <link rel="stylesheet" href="~/assets/css/style.css">
 
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+    @*asp-append-version="true"*@
+
 </head>
 
 <body>
@@ -131,15 +135,15 @@
                                             <ul class="axil-submenu">
                                                 <li>
                                                     <a class="hover-flip-item-wrapper" asp-controller="BlogPosts" asp-action="AdminPage">
-                                                        <span class="">
-                                                            <span>Admin</span>
+                                                        <span class="hover-flip-item">
+                                                            <span data-text="Admin">Admin</span>
                                                         </span>
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <a class="hover-flip-item-wrapper" asp-controller="BlogPosts" asp-action="Create">
-                                                        <span class="">
-                                                            <span>New Post</span>
+                                                        <span class="hover-flip-item">
+                                                            <span data-text="New Post">New Post</span>
                                                         </span>
                                                     </a>
                                                 </li>

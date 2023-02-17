@@ -1,4 +1,5 @@
 ﻿using CSBlog.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CSBlog.Services.Interfaces
 {
@@ -66,6 +67,7 @@ namespace CSBlog.Services.Interfaces
         #region Add Tags / Search / Slug
         public Task<bool> IsTagOnBlogPostAsync(int tagId, int BlogPostId);
         public Task AddBlogPostToTagsAsync(IEnumerable<int> tagIds, int blogPostId);
+        public Task AddBlogPostToTagsAsync(string stringTags, int blogPostId);
         public Task RemoveAllBlogPostTagsAsync(int blogPostId);
         public IEnumerable<BlogPost> Search(string searchString);
         public Task<bool> ValidateSlugAsync(string title, int blogPostId);
