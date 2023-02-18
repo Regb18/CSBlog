@@ -238,7 +238,7 @@ namespace CSBlog.Controllers
                 }
                 return RedirectToAction(nameof(AdminPage));
             }
-            ViewData["CategoryId"] = new SelectList(await _blogPostService.GetCategoriesAsync(), "Id", "Name", blogPost.CategoryId);
+            ViewData["CategoryList"] = new SelectList(await _blogPostService.GetCategoriesAsync(), "Id", "Name", blogPost.CategoryId);
             return View(blogPost);
         }
 

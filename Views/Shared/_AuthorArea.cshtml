@@ -1,4 +1,8 @@
-﻿
+﻿@using CSBlog.Services.Interfaces
+@using CSBlog.Enums;
+
+@inject IImageService _ImageService
+
 <!-- Start Author Area  -->
 <div class="axil-author-area axil-author-banner bg-color-grey">
     <div class="container">
@@ -8,7 +12,7 @@
                     <div class="media">
                         <div class="thumbnail">
                             <a href="#">
-                                <img src="~/assets/images/post-images/author/author-b1.png" alt="Author Images">
+                                <img src="~/img/DefaultUserImage.png" alt="Author Images">
                             </a>
                         </div>
                         <div class="media-body">

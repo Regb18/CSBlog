@@ -90,49 +90,22 @@
         <!-- End Post List  -->
     </div>
     <!-- End Single Widget  -->
-    <!--------------------------->
-    <!--------------------------->
-    <!--------------------------->
-    <!-- TODO: Popular Tags -->
-    <!--------------------------->
-    <!--------------------------->
-    <!--------------------------->
+
+
+
+    <!-- Popular Tags -->
     <!-- Start Single Widget  -->
     <div class="axil-single-widget widget widget_instagram mb--30">
-        <h5 class="widget-title">Instagram</h5>
+        <h5 class="widget-title">Popular Tags</h5>
         <!-- Start Post List  -->
-        <ul class="instagram-post-list-wrapper">
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-01.jpg" alt="Instagram Images">
+        <div class="tagcloud">
+            @foreach (Tag tag in (await _BlogPostService.GetTagsAsync()).Take(6))
+            {
+                <a asp-controller="Tags" asp-action="Details" asp-route-id="@tag.Id">
+                    @tag.Name
                 </a>
-            </li>
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-02.jpg" alt="Instagram Images">
-                </a>
-            </li>
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-03.jpg" alt="Instagram Images">
-                </a>
-            </li>
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-04.jpg" alt="Instagram Images">
-                </a>
-            </li>
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-05.jpg" alt="Instagram Images">
-                </a>
-            </li>
-            <li class="instagram-post-list">
-                <a href="#">
-                    <img src="~/assets/images/small-images/instagram-06.jpg" alt="Instagram Images">
-                </a>
-            </li>
-        </ul>
+            }
+        </div>
         <!-- End Post List  -->
     </div>
     <!-- End Single Widget  -->
