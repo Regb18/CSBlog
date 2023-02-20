@@ -180,6 +180,7 @@ namespace CSBlog.Services
                 throw;
             }
         }
+
         public async Task<IEnumerable<BlogPost>> GetRecentPostsAsync(int count)
         {
             try
@@ -196,6 +197,28 @@ namespace CSBlog.Services
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<BlogPost>> GetCategoryPostsAsync(int? categoryId)
+        {
+            try
+            {
+                IEnumerable<BlogPost> blogPosts = await _context.BlogPosts
+                                                                .Where(b => b.IsPublished == true && b.IsDeleted == false)
+                                                                .Where(b => b.CategoryId == categoryId)
+                                                                .Include(b => b.Category)
+                                                                .Include(b => b.Tags)
+                                                                .Include(b => b.Comments)
+                                                                    .ThenInclude(c => c.Author)
+                                                                .ToListAsync();
+
+                return blogPosts.OrderByDescending(b => b.Created);
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }
@@ -527,9 +550,48 @@ namespace CSBlog.Services
                 throw;
             }
         }
-        public IEnumerable<BlogPost> Search(string searchString)
+        public IEnumerable<BlogPost> SearchBlogPosts(string? searchString)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // IEnumerable<BlogPost> blogPosts = new(); - can't instantiate an interface
+                IEnumerable<BlogPost> blogPosts = new List<BlogPost>();
+
+                if (string.IsNullOrEmpty(searchString))
+                {
+                    return blogPosts;
+                }
+                else
+                {
+                    searchString = searchString.Trim().ToLower();
+
+                    blogPosts = _context.BlogPosts.Where(b => b.Title!.ToLower().Contains(searchString) ||
+                                                         b.Abstract!.ToLower().Contains(searchString) ||
+                                                         b.Content!.ToLower().Contains(searchString) ||
+                                                         b.Category!.Name!.ToLower().Contains(searchString) ||
+                                                         //.Any can search all the properties of the collection
+                                                         b.Comments.Any(c => c.Body!.ToLower().Contains(searchString) ||
+                                                                        c.Author!.FirstName!.ToLower().Contains(searchString) ||
+                                                                        c.Author!.LastName!.ToLower().Contains(searchString)) ||
+                                                         b.Tags.Any(c => c.Name!.ToLower().Contains(searchString)))
+                                                  .Include(b => b.Comments)
+                                                        .ThenInclude(c => c.Author)
+                                                  .Include(b => b.Category)
+                                                  .Include(b => b.Tags)
+                                                  .Where(b => b.IsPublished == true && b.IsDeleted == false)
+                                                  .AsNoTracking()
+                                                  .OrderByDescending(b => b.Created)
+                                                  .AsEnumerable();
+
+                    return blogPosts;
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         public async Task<bool> ValidateSlugAsync(string title, int blogPostId)
         {
@@ -537,6 +599,8 @@ namespace CSBlog.Services
             {
                 string newSlug = StringHelper.BlogSlug(title);
 
+                // a new blogPost has no ID yet so it should equal 0. If it does we assign it a new slug
+                // if it doesn't, goes to the else 
                 if (blogPostId == 0)
                 {
                     // AnyAsync - checking the database to see if theres a matching slug

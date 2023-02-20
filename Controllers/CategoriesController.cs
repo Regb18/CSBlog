@@ -9,6 +9,8 @@ using CSBlog.Data;
 using CSBlog.Models;
 using CSBlog.Services.Interfaces;
 using CSBlog.Services;
+using X.PagedList;
+using CSBlog.Models.ViewModels;
 
 namespace CSBlog.Controllers
 {
@@ -30,7 +32,7 @@ namespace CSBlog.Controllers
         }
 
         // GET: Categories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int? pageNum, string? searchString)
         {
             if (id == null)
             {
@@ -39,12 +41,20 @@ namespace CSBlog.Controllers
 
             var category = await _blogPostService.GetCategoryAsync(id.Value);
 
+            int pageSize = 3;
+            int page = pageNum ?? 1;
+
+            IPagedList<BlogPost> blogPosts = (await _blogPostService.GetCategoryPostsAsync(id)).ToPagedList(page, pageSize);
+
+
+
             if (category == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(new CategoryDetailsViewModel() { Category = category, Posts = blogPosts });
+            
         }
 
         // GET: Categories/Create

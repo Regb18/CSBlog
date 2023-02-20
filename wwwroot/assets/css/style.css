@@ -10643,7 +10643,7 @@ blockquote p {
     font-size: 25px;
   }
 }
-@media only screen and (max-width: 575px) {
+@media only screen and (max-width: 575px) {banner banner-single-post post-formate
   .banner-single-post.post-formate.post-standard .post-content .title {
     font-size: 18px;
     padding-right: 0;
@@ -11509,7 +11509,7 @@ Instagram Styles
 
 .slider-style-1 .post-thumbnail .animated-image-box {
   position: relative;
-  height: 615px;
+  height: 100px;
   width: 100%;
 }
 

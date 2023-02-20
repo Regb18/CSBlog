@@ -1,7 +1,10 @@
-﻿@model IEnumerable<CSBlog.Models.BlogPost>
+﻿@model IPagedList<CSBlog.Models.BlogPost>
 
 @using CSBlog.Enums;
 @using CSBlog.Services.Interfaces
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
 
 @*only need the representation of the methods, lighter than the service*@
 @inject IImageService _ImageService
@@ -29,6 +32,23 @@
                     <partial name="_BlogCard" model="@blogPost" />
                     <!-- End Post List  -->
                 }
+
+                <div>
+                    @*shows "Page x of x"
+                    <div>
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                    </div>*@
+                    <!-- pageNum will refer to the name in the controller -->
+                    @Html.PagedListPager(Model, pageNum => Url.Action("Index", new { pageNum }),
+                    new PagedListRenderOptions
+                    {
+                        LiElementClasses = new string[] { "my-page-item" },
+                        PageClasses = new string[] { "my-page-link" },
+                    })
+
+
+                </div>
+
             </div>
             <div class="col-lg-4 col-xl-4 mt_md--40 mt_sm--40">
                 <!-- Start Sidebar Area  -->

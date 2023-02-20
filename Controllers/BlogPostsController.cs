@@ -64,28 +64,9 @@ namespace CSBlog.Controllers
         // POST: Comments/Details
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Details([Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment, int blogPostId)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        string? userId = _userManager.GetUserId(User);
 
 
-        //        comment.BlogPostId = blogPostId;
-        //        comment.AuthorId = userId;
-        //        comment.Created = DateTime.UtcNow;
 
-        //        await _blogPostService.AddCommentAsync(comment);
-
-        //        return RedirectToAction(nameof(Details));
-        //    }
-        //    // Automatically assign author to Author ID
-        //    //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-        //    //ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Title", comment.BlogPostId);
-        //    return View(comment);
-        //}
 
         // GET: BlogPosts/Create
         public async Task<IActionResult> Create()

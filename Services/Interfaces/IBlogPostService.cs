@@ -36,6 +36,7 @@ namespace CSBlog.Services.Interfaces
         // GetRecentPostsAsync()
         public Task<IEnumerable<BlogPost>> GetRecentPostsAsync();
         public Task<IEnumerable<BlogPost>> GetRecentPostsAsync(int count);
+        public Task<IEnumerable<BlogPost>> GetCategoryPostsAsync(int? categoryId);
         #endregion
 
 
@@ -69,7 +70,7 @@ namespace CSBlog.Services.Interfaces
         public Task AddBlogPostToTagsAsync(IEnumerable<int> tagIds, int blogPostId);
         public Task AddBlogPostToTagsAsync(string stringTags, int blogPostId);
         public Task RemoveAllBlogPostTagsAsync(int blogPostId);
-        public IEnumerable<BlogPost> Search(string searchString);
+        public IEnumerable<BlogPost> SearchBlogPosts(string? searchString);
         public Task<bool> ValidateSlugAsync(string title, int blogPostId);
         #endregion
 
