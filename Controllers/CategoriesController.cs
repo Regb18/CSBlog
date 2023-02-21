@@ -32,20 +32,14 @@ namespace CSBlog.Controllers
         }
 
         // GET: Categories/Details/5
-        public async Task<IActionResult> Details(int? id, int? pageNum, string? searchString)
+        public async Task<IActionResult> Details(int? id, int? pageNum)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var category = await _blogPostService.GetCategoryAsync(id.Value);
-
-            int pageSize = 3;
-            int page = pageNum ?? 1;
-
-            IPagedList<BlogPost> blogPosts = (await _blogPostService.GetCategoryPostsAsync(id)).ToPagedList(page, pageSize);
-
+            Category category = await _blogPostService.GetCategoryAsync(id.Value);
 
 
             if (category == null)
@@ -53,7 +47,16 @@ namespace CSBlog.Controllers
                 return NotFound();
             }
 
-            return View(new CategoryDetailsViewModel() { Category = category, Posts = blogPosts });
+            //int pageSize = 3;
+
+            int page = pageNum ?? 1;
+            ViewData["Page"] = page;
+            return View(category);
+
+            // Can use these with the ViewModel and the Details Copy as well
+
+            //IPagedList<BlogPost> blogPosts = (await _blogPostService.GetCategoryPostsAsync(id)).ToPagedList(page, pageSize);
+            //return View(new CategoryDetailsViewModel() { Category = category, Posts = blogPosts });
             
         }
 

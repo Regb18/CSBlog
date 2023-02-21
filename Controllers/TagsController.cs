@@ -27,7 +27,7 @@ namespace CSBlog.Controllers
         }
 
         // GET: Tags/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int? pageNum)
         {
             if (id == null)
             {
@@ -40,6 +40,9 @@ namespace CSBlog.Controllers
             {
                 return NotFound();
             }
+
+            int page = pageNum ?? 1;
+            ViewData["Page"] = page;
 
             return View(tag);
         }

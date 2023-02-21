@@ -358,6 +358,7 @@ namespace CSBlog.Services
             {
                 Tag? tag = await _context.Tags
                                          .Include(c => c.BlogPosts)
+                                            .ThenInclude(b=>b.Category)
                                          .FirstOrDefaultAsync(m => m.Id == tagId);
                 return tag!;
 
@@ -395,11 +396,29 @@ namespace CSBlog.Services
             try
             {
                 IEnumerable<Comment> comments = await _context.Comments
-                                                      .Include(c => c.Author)
-                                                      .Include(c => c.BlogPost)
-                                                      .ToListAsync();
+                                                              .Include(c => c.Author)
+                                                              .Include(c => c.BlogPost)
+                                                              .ToListAsync();
 
                 return comments;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<IEnumerable<Comment>> GetRecentCommentsAsync(int blogPostId)
+        {
+            try
+            {
+                IEnumerable<Comment> comments = await _context.Comments
+                                                              .Where(c=>c.BlogPostId == blogPostId)
+                                                              .Include(c => c.Author)
+                                                              .Include(c => c.BlogPost)
+                                                              .ToListAsync();
+
+                return comments.OrderByDescending(b => b.Created);
             }
             catch (Exception)
             {

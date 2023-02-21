@@ -61,6 +61,7 @@ namespace CSBlog.Services.Interfaces
         public Task AddCommentAsync(Comment comment);
         public Task UpdateCommentAsync(Comment comment);
         public Task<IEnumerable<Comment>> GetCommentsAsync();
+        public Task<IEnumerable<Comment>> GetRecentCommentsAsync(int blogPostId);
         public Task DeleteCommentAsync(Comment comment);
         public Task<Comment> GetCommentAsync(int commentId);
         #endregion

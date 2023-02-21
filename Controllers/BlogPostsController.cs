@@ -60,13 +60,6 @@ namespace CSBlog.Controllers
             return View(blogPost);
         }
 
-        // TODO: Post Comment
-        // POST: Comments/Details
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-
-
-
 
         // GET: BlogPosts/Create
         public async Task<IActionResult> Create()

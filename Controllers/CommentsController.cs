@@ -9,15 +9,21 @@ using CSBlog.Data;
 using CSBlog.Models;
 using CSBlog.Services;
 using CSBlog.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace CSBlog.Controllers
 {
     public class CommentsController : Controller
     {
         private readonly IBlogPostService _blogPostService;
-        public CommentsController(IBlogPostService blogPostService)
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<BlogUser> _userManager;
+
+        public CommentsController(IBlogPostService blogPostService, ApplicationDbContext context, UserManager<BlogUser> userManager)
         {
             _blogPostService = blogPostService;
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Comments
@@ -46,11 +52,14 @@ namespace CSBlog.Controllers
         }
 
         // GET: Comments/Create
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
+            //string? userId = _userManager.GetUserId(User);
+            // Get BlogPost ID
+
             // Automatically assign author to Author ID           
             //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content");
+            //ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content");
             return View();
         }
 
@@ -59,19 +68,33 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment)
+        public async Task<IActionResult> Create([Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment, int blogPostId)
         {
+            BlogPost? blogPost = await _blogPostService.GetBlogPostAsync(blogPostId);
+            ModelState.Remove("AuthorId");
+
             if (ModelState.IsValid)
             {
+                // Automatically assign author and blogpost
+                comment.AuthorId = _userManager.GetUserId(User);
+                comment.BlogPostId = blogPost!.Id;
+
                 comment.Created = DateTime.UtcNow;
 
-                await _blogPostService.AddCommentAsync(comment);
 
-                return RedirectToAction(nameof(Index));
+                _context.Add(comment);
+                blogPost.Comments.Add(comment);
+
+                //blogPost!.Comments.OrderByDescending(c => c.Created);
+
+                await _context.SaveChangesAsync();
+
+                //await _blogPostService.AddCommentAsync(comment);
+
+                return RedirectToAction(blogPost.Slug, "Content");
+                //return View();
             }
-            // Automatically assign author to Author ID
-            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Title", comment.BlogPostId);
+
             return View(comment);
         }
 
