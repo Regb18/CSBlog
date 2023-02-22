@@ -373,11 +373,17 @@ namespace CSBlog.Services
 
 
         #region Comment CRUD Methods
-        public async Task AddCommentAsync(Comment comment)
+        public async Task AddCommentAsync(Comment comment, int blogPostId)
         {
+            BlogPost? blogPost = await _context.BlogPosts
+                                 .Include(c => c.Comments) // Eager Load
+                                 .FirstOrDefaultAsync(c => c.Id == blogPostId);
+
             try
             {
                 _context.Add(comment);
+                blogPost!.Comments.Add(comment);
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception)

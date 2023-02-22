@@ -1,6 +1,7 @@
-﻿using Humanizer;
+﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CSBlog.Models
 {
@@ -46,10 +47,16 @@ namespace CSBlog.Models
 
         // foreign key Many-to-1 - 1 category can have many blog posts
         public int CategoryId { get; set; }
+
+        [JsonIgnore]
         public virtual Category? Category { get; set; }
-        
-        // 1-to-Many 1 Blog post can have many tags and many comments
+
+        // Many-to-Many
+        [JsonIgnore]
         public virtual ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
+
+        // 1-to-Many 1 Blog post can have many comments
+        [JsonIgnore]
         public virtual ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
 
     }

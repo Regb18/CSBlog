@@ -135,11 +135,11 @@
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        @if (comment.AuthorId == _userManager.GetUserId(User))
+                                                        @if (User.IsInRole("Admin") || User.IsInRole("Moderator") || comment.AuthorId == _userManager.GetUserId(User))
                                                         {
                                                         <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id">Edit</a>                                                            
                                                         }
-                                                        @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
+                                                        @if (User.IsInRole("Admin") || User.IsInRole("Moderator") || comment.AuthorId == _userManager.GetUserId(User))
                                                         {
                                                        <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id">Delete</a>
                                                         }

@@ -58,7 +58,7 @@ namespace CSBlog.Services.Interfaces
         #endregion
 
         #region Comment CRUD Methods
-        public Task AddCommentAsync(Comment comment);
+        public Task AddCommentAsync(Comment comment, int blogPostId);
         public Task UpdateCommentAsync(Comment comment);
         public Task<IEnumerable<Comment>> GetCommentsAsync();
         public Task<IEnumerable<Comment>> GetRecentCommentsAsync(int blogPostId);

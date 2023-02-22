@@ -4,6 +4,8 @@ using CSBlog.Models;
 using CSBlog.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,42 @@ builder.Services.AddScoped<IBlogPostService, BlogPostService>();
 
 builder.Services.AddMvc();
 
+// Add API configs
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "CSharp Blog API",
+        Version = "v1",
+        Description = "Serve up Blog Data using .Net 6 Apis",
+        Contact = new OpenApiContact
+        {
+            Name = "R.Barnes",
+            Email = "reginald.ac.barnes@gmail.com"
+            // can point this to portfolio
+            //Url = new Uri("https://www.linkedin.com/in/racbarnes/")
+        }
+    });
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
+});
+
+
+builder.Services.AddCors(obj =>
+{
+    obj.AddPolicy("DefaultPolicy",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
+// End API configs
+
 var app = builder.Build();
+
+// API call
+app.UseCors("DefaultPolicy");
 
 var scope = app.Services.CreateScope();
 await DataUtility.ManageDataAsync(scope.ServiceProvider);
@@ -43,6 +80,19 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+// Add Swagger UI config
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PublicAPI v1");
+    c.InjectStylesheet("/css/swagger.css");
+    c.InjectJavascript("/js/swagger.js");
+    c.DocumentTitle = "CSharp Blog Public API";
+});
+// End Swagger UI config
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

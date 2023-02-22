@@ -8,9 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using CSBlog.Data;
 using CSBlog.Models;
 using CSBlog.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace CSBlog.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TagsController : Controller
     {
         private readonly IBlogPostService _blogPostService;
@@ -27,6 +30,7 @@ namespace CSBlog.Controllers
         }
 
         // GET: Tags/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id, int? pageNum)
         {
             if (id == null)

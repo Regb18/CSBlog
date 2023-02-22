@@ -10,19 +10,20 @@ using CSBlog.Models;
 using CSBlog.Services;
 using CSBlog.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace CSBlog.Controllers
 {
+    [Authorize(Roles = "Admin, Moderator")]
     public class CommentsController : Controller
     {
         private readonly IBlogPostService _blogPostService;
-        private readonly ApplicationDbContext _context;
         private readonly UserManager<BlogUser> _userManager;
 
-        public CommentsController(IBlogPostService blogPostService, ApplicationDbContext context, UserManager<BlogUser> userManager)
+        public CommentsController(IBlogPostService blogPostService, UserManager<BlogUser> userManager)
         {
             _blogPostService = blogPostService;
-            _context = context;
             _userManager = userManager;
         }
 
@@ -54,18 +55,13 @@ namespace CSBlog.Controllers
         // GET: Comments/Create
         public IActionResult Create()
         {
-            //string? userId = _userManager.GetUserId(User);
-            // Get BlogPost ID
-
-            // Automatically assign author to Author ID           
-            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-            //ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content");
             return View();
         }
 
         // POST: Comments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment, int blogPostId)
@@ -75,30 +71,27 @@ namespace CSBlog.Controllers
 
             if (ModelState.IsValid)
             {
-                // Automatically assign author and blogpost
+
                 comment.AuthorId = _userManager.GetUserId(User);
-                comment.BlogPostId = blogPost!.Id;
 
-                comment.Created = DateTime.UtcNow;
+                if (User.Identity!.IsAuthenticated == true)
+                {
+                    // Automatically assign author and blogpost
+                    comment.BlogPostId = blogPost!.Id;
 
+                    comment.Created = DateTime.UtcNow;
 
-                _context.Add(comment);
-                blogPost.Comments.Add(comment);
+                    await _blogPostService.AddCommentAsync(comment, blogPostId);
 
-                //blogPost!.Comments.OrderByDescending(c => c.Created);
-
-                await _context.SaveChangesAsync();
-
-                //await _blogPostService.AddCommentAsync(comment);
-
-                return RedirectToAction(blogPost.Slug, "Content");
-                //return View();
+                    return RedirectToAction(blogPost.Slug, "Content");
+                }
             }
 
             return View(comment);
         }
 
         // GET: Comments/Edit/5
+        [AllowAnonymous]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -112,15 +105,21 @@ namespace CSBlog.Controllers
             {
                 return NotFound();
             }
-            // Automatically assign author to Author ID
-            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
-            return View(comment);
+
+            // TODO: Automatically assign author to Author ID & BlogPost and add if Statement to Delete
+
+            if (comment.AuthorId == _userManager.GetUserId(User) || User.IsInRole("Admin") || User.IsInRole("Moderator"))
+            {
+                return View(comment);
+            }
+
+            return NotFound();
         }
 
         // POST: Comments/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Body,Created,Updated,UpdateReason,BlogPostId,AuthorId")] Comment comment)
@@ -134,6 +133,8 @@ namespace CSBlog.Controllers
             {
                 try
                 {
+                    // Automatically assign author to Author ID
+
                     comment.Created = DateTime.SpecifyKind(comment.Created, DateTimeKind.Utc);
 
                     await _blogPostService.UpdateCommentAsync(comment);
@@ -151,13 +152,12 @@ namespace CSBlog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            // Automatically assign author to Author ID
-            //ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["BlogPostId"] = new SelectList(await _blogPostService.GetBlogPostsAsync(), "Id", "Content", comment.BlogPostId);
+
             return View(comment);
         }
 
         // GET: Comments/Delete/5
+        [AllowAnonymous]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -172,10 +172,16 @@ namespace CSBlog.Controllers
                 return NotFound();
             }
 
-            return View(comment);
+            if (comment.AuthorId == _userManager.GetUserId(User) || User.IsInRole("Admin") || User.IsInRole("Moderator"))
+            {
+                return View(comment);
+            }
+
+            return NotFound();
         }
 
         // POST: Comments/Delete/5
+        [AllowAnonymous]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -186,18 +192,13 @@ namespace CSBlog.Controllers
             }
 
             var comment = await _blogPostService.GetCommentAsync(id);
-            
-            if (comment != null)
-            {
-                await _blogPostService.DeleteCommentAsync(comment);
-            }
-            
+
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> CommentExists(int id)
         {
-          return (await _blogPostService.GetCommentsAsync()).Any(e => e.Id == id);
+            return (await _blogPostService.GetCommentsAsync()).Any(e => e.Id == id);
         }
     }
 }

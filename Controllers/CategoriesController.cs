@@ -11,9 +11,12 @@ using CSBlog.Services.Interfaces;
 using CSBlog.Services;
 using X.PagedList;
 using CSBlog.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace CSBlog.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly IBlogPostService _blogPostService;
@@ -32,6 +35,7 @@ namespace CSBlog.Controllers
         }
 
         // GET: Categories/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id, int? pageNum)
         {
             if (id == null)
