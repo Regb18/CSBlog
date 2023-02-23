@@ -18,7 +18,7 @@
                 <li class="cat-item">
                     <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" class="inner">
                         <div class="thumbnail">
-                            <img class="cat-thumbnail" src="@_ImageService.ConvertByteArrayToFile(category.ImageData!, category.ImageType!,(int)DefaultImage.CategoryImage)" alt="Category Image">
+                            <img src="@_ImageService.ConvertByteArrayToFile(category.ImageData!, category.ImageType!,(int)DefaultImage.CategoryImage)" alt="Category Image">
                         </div>
                         <div class="content">
                             <h5 class="title">@category.Name</h5>

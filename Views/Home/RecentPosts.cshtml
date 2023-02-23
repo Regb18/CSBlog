@@ -33,20 +33,22 @@
                     <!-- End Post List  -->
                 }
 
-                <div>
-                    @*shows "Page x of x"
+               <div id="page-selector">
+
                     <div>
-                    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
-                    </div>*@
-                    <!-- pageNum will refer to the name in the controller -->
-                    @Html.PagedListPager(Model, pageNum => Url.Action("RecentPosts", new { pageNum }),
-                    new PagedListRenderOptions
-                    {
-                    LiElementClasses = new string[] { "my-page-item" },
-                    PageClasses = new string[] { "my-page-link" },
-                    })
+                        @*shows "Page x of x"*@
+                        @*<div>
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                        </div>*@
+                        <!-- pageNum will refer to the name in the controller -->
+                        @Html.PagedListPager(Model, pageNum => Url.Action("RecentPosts", new { pageNum }),
+                        new PagedListRenderOptions {
+                        ContainerDivClasses = new string[] { "axil-single-widget", "widget", "widget_social" },
+                        UlElementClasses = new string[] { "social-icon", "justify-content-left" },
+                        LiElementClasses = new string[] { "fab", "fw-bold" },
+                        })
 
-
+                    </div>
                 </div>
 
             </div>

@@ -41,19 +41,22 @@
                     <!-- End Post List  -->
                 }
 
-                <div>
-@*                    <div>
-                        Page @(Model.Posts < blogPost.PageNumber ? 0 : blogPost.PageNumber) of @blogPost.PageCount
-                    </div>*@
-                    <!-- pageNum will refer to the name in the controller  /  Url.Action creates a URL, the stuff in the brackets is just the order they'll show -->
-                    @Html.PagedListPager(pageOfPosts, pageNum => Url.Action("Details", new {  id = Model.Id, pageNum }),
-                    new PagedListRenderOptions
-                    {
-                    LiElementClasses = new string[] { "my-page-item" },
-                    PageClasses = new string[] { "my-page-link" },
-                    })
+               <div id="page-selector">
 
+                    <div>
+                        @*shows "Page x of x"*@
+                        @*<div>
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                        </div>*@
+                        <!-- pageNum will refer to the name in the controller -->
+                        @Html.PagedListPager(pageOfPosts, pageNum => Url.Action("Details", new { pageNum }),
+                        new PagedListRenderOptions {
+                        ContainerDivClasses = new string[] { "axil-single-widget", "widget", "widget_social" },
+                        UlElementClasses = new string[] { "social-icon", "justify-content-left" },
+                        LiElementClasses = new string[] { "fab", "fw-bold" },
+                        })
 
+                    </div>
                 </div>
 
             </div>
