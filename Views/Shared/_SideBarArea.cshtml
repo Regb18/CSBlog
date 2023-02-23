@@ -18,7 +18,7 @@
                 <li class="cat-item">
                     <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" class="inner">
                         <div class="thumbnail">
-                            <img src="@_ImageService.ConvertByteArrayToFile(category.ImageData!, category.ImageType!,(int)DefaultImage.CategoryImage)" alt="Category Image">
+                            <img class="cat-thumbnail" src="@_ImageService.ConvertByteArrayToFile(category.ImageData!, category.ImageType!,(int)DefaultImage.CategoryImage)" alt="Category Image">
                         </div>
                         <div class="content">
                             <h5 class="title">@category.Name</h5>
@@ -81,10 +81,8 @@
         <h5 class="widget-title">Stay In Touch</h5>
         <!-- Start Post List  -->
         <ul class="social-icon md-size justify-content-center">
-            <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-            <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="#"><i class="far fa-envelope"></i></a></li>
             <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-            <li><a href="#"><i class="fab fa-slack"></i></a></li>
             <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
         </ul>
         <!-- End Post List  -->

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +25,10 @@ builder.Services.AddIdentity<BlogUser, IdentityRole>(options => options.SignIn.R
 
 // Custom Services
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddScoped<IBlogPostService, BlogPostService>();
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddMvc();
 

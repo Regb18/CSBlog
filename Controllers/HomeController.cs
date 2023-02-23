@@ -24,11 +24,35 @@ namespace CSBlog.Controllers
 
         public async Task<IActionResult> Index(int? pageNum)
         {
-            int pageSize = 3;
+            int pageSize = 4;
             // if its trying to show a page that doesn't exist it gives the 1st one
             int page = pageNum ?? 1;
 
                                             // the parentheses makes sure this happens first before anything else happens
+            IPagedList<BlogPost> blogPosts = (await _blogPostService.GetRecentPostsAsync()).ToPagedList(page, pageSize);
+
+            return View(blogPosts);
+        }
+
+        public async Task<IActionResult> PopularPosts(int? pageNum)
+        {
+            int pageSize = 4;
+            // if its trying to show a page that doesn't exist it gives the 1st one
+            int page = pageNum ?? 1;
+
+            // the parentheses makes sure this happens first before anything else happens
+            IPagedList<BlogPost> blogPosts = (await _blogPostService.GetPopularPostsAsync()).ToPagedList(page, pageSize);
+
+            return View(blogPosts);
+        }
+
+        public async Task<IActionResult> RecentPosts(int? pageNum)
+        {
+            int pageSize = 4;
+            // if its trying to show a page that doesn't exist it gives the 1st one
+            int page = pageNum ?? 1;
+
+            // the parentheses makes sure this happens first before anything else happens
             IPagedList<BlogPost> blogPosts = (await _blogPostService.GetRecentPostsAsync()).ToPagedList(page, pageSize);
 
             return View(blogPosts);

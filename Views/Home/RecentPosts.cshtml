@@ -1,5 +1,4 @@
-﻿@model Category  
-
+﻿@model IPagedList<CSBlog.Models.BlogPost>
 
 @using CSBlog.Enums;
 @using CSBlog.Services.Interfaces
@@ -7,34 +6,27 @@
 @using X.PagedList.Mvc.Core;
 @using X.PagedList.Web.Common;
 
+@*only need the representation of the methods, lighter than the service*@
 @inject IImageService _ImageService
+@inject IBlogPostService _BlogPostService
 
-@{
-    int pageSize = 4;
-    int pageNum = ViewBag.Page;
 
-    // we have to put this here or in a viewModel because there's no IPagedList in the model
-    IPagedList<BlogPost> pageOfPosts = Model.BlogPosts
-                                            .Where(b => b.IsPublished == true && b.IsDeleted == false)
-                                            .ToPagedList(pageNum, pageSize);
-}
-
-<!-- Start Category Area  -->
-<partial name="_CategoryArea" />
-<!-- End Category Area  -->
+<!-- Start Author Area  -->
+<partial name="_AuthorArea" />
+<!-- End Author Area  -->
 <!-- Start Post List Wrapper  -->
 <div class="axil-post-list-area axil-section-gap bg-color-white">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="page-title">
-                    <h2 class="title mb--40">Articles in @Model.Name</h2>
+                    <h2 class="title mb--40">Recent Articles By This Author</h2>
                 </div>
             </div>
             <div class="col-lg-8 col-xl-8">
                 @*For each BlogPost*@
 
-                @foreach (BlogPost blogPost in pageOfPosts)
+                @foreach (BlogPost blogPost in Model)
                 {
                     <!-- Start Post List  -->
                     <partial name="_BlogCard" model="@blogPost" />
@@ -42,11 +34,12 @@
                 }
 
                 <div>
-@*                    <div>
-                        Page @(Model.Posts < blogPost.PageNumber ? 0 : blogPost.PageNumber) of @blogPost.PageCount
+                    @*shows "Page x of x"
+                    <div>
+                    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
                     </div>*@
-                    <!-- pageNum will refer to the name in the controller  /  Url.Action creates a URL, the stuff in the brackets is just the order they'll show -->
-                    @Html.PagedListPager(pageOfPosts, pageNum => Url.Action("Details", new {  id = Model.Id, pageNum }),
+                    <!-- pageNum will refer to the name in the controller -->
+                    @Html.PagedListPager(Model, pageNum => Url.Action("RecentPosts", new { pageNum }),
                     new PagedListRenderOptions
                     {
                     LiElementClasses = new string[] { "my-page-item" },

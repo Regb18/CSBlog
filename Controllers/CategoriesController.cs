@@ -75,10 +75,16 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,ImageData,ImageType")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,ImageFile,ImageData,ImageType")] Category category)
         {
             if (ModelState.IsValid)
             {
+                if (category.ImageFile != null)
+                {
+                    category.ImageData = await _imageService.ConvertFileToByteArrayAsync(category.ImageFile);
+                    category.ImageType = category.ImageFile.ContentType;
+                }
+
                 await _blogPostService.AddCategoryAsync(category);
                 return RedirectToAction(nameof(Index));
             }
@@ -106,7 +112,7 @@ namespace CSBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageData,ImageType")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageFile,ImageData,ImageType")] Category category)
         {
             if (id != category.Id)
             {
@@ -117,6 +123,12 @@ namespace CSBlog.Controllers
             {
                 try
                 {
+                    if (category.ImageFile != null)
+                    {
+                        category.ImageData = await _imageService.ConvertFileToByteArrayAsync(category.ImageFile);
+                        category.ImageType = category.ImageFile.ContentType;
+                    }
+
                     await _blogPostService.UpdateCategoryAsync(category);
                 }
                 catch (DbUpdateConcurrencyException)

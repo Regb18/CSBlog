@@ -16,7 +16,7 @@
 	|	|
 	|	|___ Reset Styles
 	|	|___ Typography
-	|	|___ Animations
+	|	|___ Animationscat-thumbnail
 	|	|___ Utilities
 	|
 	|
@@ -7598,6 +7598,7 @@ button.video-popup:hover {
   visibility: hidden;
   z-index: 1000;
   cursor: pointer;
+  padding:0;
 }
 
 #backto-top::after {
@@ -10784,12 +10785,12 @@ blockquote p {
 }
 .comment-list .comment .single-comment .comment-img {
   margin-bottom: 15px;
-  min-width: 60px;
+  min-width: 40px;
   margin-right: 20px;
 }
 .comment-list .comment .single-comment .comment-img img {
   border-radius: 100%;
-  width: 100%;
+  width: 80px;
 }
 .comment-list .comment .commenter {
   margin-bottom: 4px;

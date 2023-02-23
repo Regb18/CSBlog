@@ -42,8 +42,8 @@
                                 </a>
                             </h4>
                             <div class="post-meta-wrapper">
-                                <div class="post-meta">
-                                    <div class="content">
+                                <div class="post-meta row">
+                                    <div class="content col-6">
                                         <h6 class="post-author-name">
                                             <a class="hover-flip-item-wrapper" href="author.html">
                                                 <span class="hover-flip-item">
@@ -56,10 +56,16 @@
                                             <li>@blogPost.Comments.Count Comments</li>
                                         </ul>
                                     </div>
-                                    <div>
-                                        <a asp-action="Edit" asp-route-id="@blogPost.Id">Edit</a> |
-                                        <a asp-action="Details" asp-route-slug="@blogPost.Slug">Details</a> |
-                                        <a asp-action="Delete" asp-route-id="@blogPost.Id">Delete</a>
+                                    <div class="col-6">
+                                        <a asp-action="Edit" asp-route-id="@blogPost.Id">
+                                            <i class="bi bi-pencil-fill fs-4 me-1"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-slug="@blogPost.Slug">
+                                            <i class="bi bi-file-text fs-4 me-1"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@blogPost.Id">
+                                            <i class="bi bi-trash-fill fs-4"></i>
+                                        </a>
                                     </div>
                                 </div>
 

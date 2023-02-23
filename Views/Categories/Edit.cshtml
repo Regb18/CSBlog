@@ -1,5 +1,11 @@
 ﻿@model CSBlog.Models.Category
 
+@using CSBlog.Enums;
+@using CSBlog.Services.Interfaces
+
+@*only need the representation of the methods, lighter than the service*@
+@inject IImageService _ImageService
+
 @{
     ViewData["Title"] = "Edit";
 }
@@ -10,7 +16,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -24,14 +30,10 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
-                <input asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageType" class="control-label"></label>
-                <input asp-for="ImageType" class="form-control" />
-                <span asp-validation-for="ImageType" class="text-danger"></span>
+                <label asp-for="ImageFile" class="control-label">Category Image</label>
+                <img class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_ImageService.ConvertByteArrayToFile(Model.ImageData!, Model.ImageType!,(int)DefaultImage.CategoryImage)" id="blogImage">
+                <input asp-for="ImageFile" type="file" class="form-control mt-3 pt-2" accept=".png,.jpg,.jpeg,.gif"
+                       onchange="document.getElementById('blogImage').src = window.URL.createObjectURL(this.files[0])" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -45,5 +47,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

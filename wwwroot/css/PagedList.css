@@ -19,8 +19,8 @@
 }
 
 .my-page-item a.my-page-link:hover, a.my-page-link:active {
-    color: #fff;
-    background-color: #ff4242;
+    background-color: #3858f6;
+    color: #ffffff;
 }
 
 .my-page-item my-page-link li:first-child a {
