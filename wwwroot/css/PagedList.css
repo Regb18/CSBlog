@@ -18,7 +18,7 @@
     transition: all 0.3s ease;
 }
 
-.my-page-item a.my-page-link:hover, a.my-page-link:active {
+.my-page-item a.my-page-link:hover, a.my-page-link:active, a.my-page-link:disabled {
     background-color: #3858f6;
     color: #ffffff;
 }
