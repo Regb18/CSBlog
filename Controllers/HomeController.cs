@@ -20,8 +20,8 @@ namespace CSBlog.Controllers
         private readonly UserManager<BlogUser> _userManager;
         private readonly IEmailSender _emailService;
 
-        public HomeController(ILogger<HomeController> logger, 
-                              ApplicationDbContext context, 
+        public HomeController(ILogger<HomeController> logger,
+                              ApplicationDbContext context,
                               IBlogPostService blogPostService,
                               UserManager<BlogUser> userManager,
                               IEmailSender emailService)
@@ -32,16 +32,18 @@ namespace CSBlog.Controllers
             _userManager = userManager;
             _emailService = emailService;
         }
-        
-        
+
+
         #region Index, Popular/Recent Posts, Search
-        public async Task<IActionResult> Index(int? pageNum)
+        public async Task<IActionResult> Index(int? pageNum, string? swalMessage = null)
         {
+            ViewData["SwalMessage"] = swalMessage;
+
             int pageSize = 4;
             // if its trying to show a page that doesn't exist it gives the 1st one
             int page = pageNum ?? 1;
 
-                                            // the parentheses makes sure this happens first before anything else happens
+            // the parentheses makes sure this happens first before anything else happens
             IPagedList<BlogPost> blogPosts = (await _blogPostService.GetRecentPostsAsync()).ToPagedList(page, pageSize);
 
             return View(blogPosts);
@@ -71,7 +73,7 @@ namespace CSBlog.Controllers
             return View(blogPosts);
         }
 
-        public IActionResult SearchIndex(int? pageNum, string? searchString) 
+        public IActionResult SearchIndex(int? pageNum, string? searchString)
         {
             int pageSize = 3;
             int page = pageNum ?? 1;
@@ -106,9 +108,7 @@ namespace CSBlog.Controllers
             // Instantiate EmailData
             EmailData emailData = new EmailData()
             {
-                EmailAddress = "reginald.ac.barnes@gmail.com",
-                FirstName = "Reggie",
-                LastName = "Barnes",
+                EmailAddress = "reginald.ac.barnes@gmail.com"
             };
 
 
@@ -123,7 +123,7 @@ namespace CSBlog.Controllers
             // IsValid = All required fields are checked
             if (ModelState.IsValid)
             {
-                //string? swalMessage = string.Empty;
+                string? swalMessage = string.Empty;
 
                 try
                 {
@@ -131,15 +131,14 @@ namespace CSBlog.Controllers
                                                        emailData.EmailSubject!,
                                                        emailData.EmailBody!);
 
-                    //swalMessage = "Your Email Has been Sent";
+                    swalMessage = "Your Email Has been Sent";
 
-                    return RedirectToAction(nameof(Index));
-                    // new is a route value that sends a parameter 
+                    return RedirectToAction(nameof(Index), new { swalMessage });
                 }
                 catch (Exception)
                 {
-                    //swalMessage = "Error: Email Send Failed";
-                    return RedirectToAction(nameof(PopularPosts));
+                    swalMessage = "Error: Email Send Failed";
+                    return RedirectToAction(nameof(Index), new { swalMessage });
                     throw;
                 }
             }

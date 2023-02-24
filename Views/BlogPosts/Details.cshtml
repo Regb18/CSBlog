@@ -120,7 +120,7 @@
                                         <div class="comment-body">
                                             <div class="single-comment">
                                                 <div class="comment-img">
-                                                    <img src="~/img/DefaultUserImage.png" alt="Author Images">
+                                                    <img class="img-fluid" src="@_ImageService.ConvertByteArrayToFile(comment.Author?.ImageData!,comment.Author?.ImageType!,(int)DefaultImage.BlogUserImage)" alt="Author Images" />
                                                 </div>
                                                 <div class="comment-inner">
                                                     <h6 class="commenter">

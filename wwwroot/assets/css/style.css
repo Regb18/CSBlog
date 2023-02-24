@@ -893,7 +893,7 @@ ul.axil-tab-button .nav-item a.nav-link.active {
 }
 
     /*=============== Style Css =============*/
-    .footer-mainmenu .footer-widget ul.ft-menu-list, .copyright-area .mainmenu, .instagram-post-list, .comment-list ul.children, .comment-list, .axil-single-widget.widget_instagram .instagram-post-list-wrapper, .axil-single-widget.widget_categories ul, ul.post-meta-list, .popup-mobilemenu-area .mainmenu .menu-item-has-children .axil-submenu, .popup-mobilemenu-area .mainmenu, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu .megamenu-item .axil-vertical-nav, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu, .mainmenu-nav ul.mainmenu, .metabar-block, ul.social-share-transparent, ul.social-with-text, ul.social-icon, ul.axil-tab-button {
+    .footer-mainmenu .footer-widget ul.ft-menu-list, .copyright-area .mainmenu, .instagram-post-list, .comment-list ul.children, .comment-list, .axil-single-widget.widget_instagram .instagram-post-list-wrapper, .axil-single-widget.widget_categories ul, ul.post-meta-list, .popup-mobilemenu-area .mainmenu .menu-item-has-children .axil-submenu, .popup-mobilemenu-area .mainmenu, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu .megamenu-item .axil-vertical-nav, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu, .mainmenu-nav ul.mainmenu, .metabar-block, ul.social-share-transparent, ul.social-with-text, ul.social-icon, ul.social-icons, ul.axil-tab-button {
         padding: 0;
         margin: 0;
         list-style: none;
@@ -905,7 +905,7 @@ ul.axil-tab-button .nav-item a.nav-link.active {
     list-style: none;
 }
 
-.copyright-area .mainmenu li a, .instagram-post-list .single-post a .instagram-button, .comment-list .comment .reply-edit a.comment-reply-link, .tagcloud a, .about-author .media-body .author-info .title a, .axil-post-details .social-share-block .post-like a i, .axil-single-widget .tagcloud a, .axil-single-widget.widget_categories ul li.cat-item .inner .content .title, .post-meta .post-author-name a, .post-content .post-cat .post-cat-list a, .content-block.post-list-view .post-content, .content-block.post-grid.post-grid-transparent .post-grid-content .post-content .post-cat .post-cat-list a, .content-block.content-direction-column, .popup-mobilemenu-area .mainmenu .menu-item-has-children > a::after, .popup-mobilemenu-area .inner .buy-now-btn a, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu li a, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu, .mainmenu-nav ul.mainmenu > li > a::after, .mainmenu-nav ul.mainmenu > li > a, .hamburger-menu .hamburger-inner .icon, .metabar-block li.icon a, .arrow-between-side .slide-arrow, ul.social-share-transparent li a, ul.social-with-text li a span, ul.social-with-text li a i, ul.social-icon li a, a.axil-button,
+.copyright-area .mainmenu li a, .instagram-post-list .single-post a .instagram-button, .comment-list .comment .reply-edit a.comment-reply-link, .tagcloud a, .about-author .media-body .author-info .title a, .axil-post-details .social-share-block .post-like a i, .axil-single-widget .tagcloud a, .axil-single-widget.widget_categories ul li.cat-item .inner .content .title, .post-meta .post-author-name a, .post-content .post-cat .post-cat-list a, .content-block.post-list-view .post-content, .content-block.post-grid.post-grid-transparent .post-grid-content .post-content .post-cat .post-cat-list a, .content-block.content-direction-column, .popup-mobilemenu-area .mainmenu .menu-item-has-children > a::after, .popup-mobilemenu-area .inner .buy-now-btn a, .mainmenu-nav ul.mainmenu > li.megamenu-wrapper .megamenu-sub-menu, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu li a, .mainmenu-nav ul.mainmenu > li.menu-item-has-children .axil-submenu, .mainmenu-nav ul.mainmenu > li > a::after, .mainmenu-nav ul.mainmenu > li > a, .hamburger-menu .hamburger-inner .icon, .metabar-block li.icon a, .arrow-between-side .slide-arrow, ul.social-share-transparent li a, ul.social-with-text li a span, ul.social-with-text li a i, ul.social-icon li a, ul.social-icons li a, a.axil-button,
 button.axil-button, a.axil-link-button, input[type=submit], .form-group textarea, .form-group input, #scrollUp, ul li a, ol li a {
     -webkit-transition: var(--transition);
     -o-transition: var(--transition);
@@ -8368,7 +8368,7 @@ Category Styles
 /*------------------------
 Social Share Styles  
 ---------------------------*/
-ul.social-icon {
+ul.social-icon, ul.social-icons {
     margin: -5px;
     display: -webkit-box;
     display: -webkit-flex;
@@ -8380,31 +8380,34 @@ ul.social-icon {
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
-    ul.social-icon {
+    ul.social-icon, ul.social-icons {
         margin: -3px;
     }
 }
 
-ul.social-icon li {
+ul.social-icon li, ul.social-icons li {
     margin: 5px;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
-    ul.social-icon li {
+    ul.social-icon li, ul.social-icons li {
         margin: 3px;
     }
 }
 
 ul.social-icon li a {
-    /*  width: 50px;
-  height: 50px;
-  line-height: 50px;
-  border-radius: 100%;
-  background: var(--color-lightest);
-  display: block;
-  text-align: center;
-  font-size: 14px;
-  color: var(--color-gray);*/
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 100%;
+    background: var(--color-lightest);
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-gray);
+}
+
+ul.social-icons li a {
     display: block;
     width: 40px;
     height: 40px;
@@ -8419,26 +8422,26 @@ ul.social-icon li a {
     transition: all 0.3s ease;
 }
 
-    ul.social-icon li a:hover {
+    ul.social-icon li a:hover, ul.social-icons li a:hover {
         background: var(--color-primary) !important;
         color: var(--color-white) !important;
     }
 
-ul.social-icon.color-tertiary li a {
+ul.social-icon.color-tertiary li a, ul.social-icons.color-tertiary li a {
     color: var(--color-tertiary);
 }
 
-    ul.social-icon.color-tertiary li a:hover {
+    ul.social-icon.color-tertiary li a:hover, ul.social-icons.color-tertiary li a:hover {
         color: var(--color-white);
     }
 
-ul.social-icon.md-size li a {
+ul.social-icon.md-size li a, ul.social-icons.md-size li a {
     width: 40px;
     height: 40px;
     line-height: 40px;
 }
 
-ul.social-icon.icon-rounded-transparent li a {
+ul.social-icon.icon-rounded-transparent li a, ul.social-icons.icon-rounded-transparent li a {
     background: transparent;
     border: 1px solid var(--color-lighter);
 }

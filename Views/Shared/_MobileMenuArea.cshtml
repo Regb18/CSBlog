@@ -1,0 +1,48 @@
+﻿        <!-- Start Mobile Menu Area  -->
+<div class="popup-mobilemenu-area">
+    <div class="inner">
+        <div class="mobile-menu-top">
+            <div class="logo">
+                <a href="index.html">
+                    <img class="dark-logo" src="~/assets/images/logo/logo-black.png" alt="Logo Images">
+                    <img class="light-logo" src="~/assets/images/logo/logo-white2.png" alt="Logo Images">
+                </a>
+            </div>
+            <div class="mobile-close">
+                <div class="icon">
+                    <i class="fal fa-times"></i>
+                </div>
+            </div>
+        </div>
+        <ul class="mainmenu">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="menu-item-has-children">
+                <a href="#">Posts</a>
+                <ul class="axil-submenu">
+                    <li><a asp-controller="Home" asp-action="Index">All Posts</a></li>
+                    <li><a asp-controller="Home" asp-action="PopularPosts">Popular Posts</a></li>
+                    <li><a asp-controller="Home" asp-action="RecentPosts">Recent Posts</a></li>
+                </ul>
+            </li>
+            <li><a asp-action="ContactMe" asp-controller="Home">Contact</a></li>
+            @if (User.Identity!.IsAuthenticated && !User.IsInRole("Admin"))
+            {
+                <li><a asp-action="MyLikes" asp-controller="BlogPosts">My Likes</a></li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="menu-item-has-children">
+                    <a href="#">Author</a>
+                    <ul class="axil-submenu">
+                        <li><a asp-controller="BlogPosts" asp-action="AdminPage">Admin</a></li>
+                        <li><a asp-controller="BlogPosts" asp-action="Create">New Post</a></li>
+                        <li><a asp-controller="BlogPosts" asp-action="Index">Manage Posts</a></li>
+                        <li><a asp-controller="Categories" asp-action="Index">Manage Categories</a></li>
+                        <li><a asp-controller="Tags" asp-action="Index">Manage Tags</a></li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<!-- End Mobile Menu Area  -->
