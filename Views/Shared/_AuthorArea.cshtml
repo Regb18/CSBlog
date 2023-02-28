@@ -1,8 +1,16 @@
-﻿@using CSBlog.Services.Interfaces
+﻿@using CSBlog.Data;
+@using CSBlog.Services.Interfaces
 @using CSBlog.Enums;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
 
 @inject IImageService _ImageService
-
+@inject ApplicationDbContext _context
+@inject UserManager<BlogUser> _userManager
+@{
+    string? userId = _userManager.GetUserId(User);
+    BlogUser? blogUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+}
 <!-- Start Author Area  -->
 <div class="axil-author-area axil-author-banner bg-color-grey">
     <div class="container">
@@ -12,7 +20,7 @@
                     <div class="media">
                         <div class="thumbnail">
                             <a href="#">
-                                <img src="~/img/DefaultUserImage.png" alt="Author Images">
+                                <img class="cat-image" src="@_ImageService.ConvertByteArrayToFile(blogUser?.ImageData!,blogUser?.ImageType!,(int)DefaultImage.BlogUserImage)" alt="">
                             </a>
                         </div>
                         <div class="media-body">
@@ -21,7 +29,7 @@
                                 <span class="b3 subtitle">Full Stack Developer</span>
                             </div>
                             <div class="content">
-                                <p class="b1 description">Description about me</p>
+                                <p class="b1 description">Hello and welcome to Code && Popcorn, my blog where I talk about all the things I've learned on my coding journey. After starting in January 2023, I feel like I've learned a lot, and I'd like to share some of my new knowledge. Please take a look around, and leave a comment if you learn something new! </p>
                                 <ul class="social-share-transparent size-md">
                                     <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="far fa-envelope"></i></a></li>
