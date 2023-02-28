@@ -7,7 +7,7 @@ namespace CSBlog.Services
     {
         // default blog, category, and user
         private readonly string _defualtUserImage = "/img/DefaultUserImage.png";
-        private readonly string _defualtBlogImage = "/img/DefaultBlogImage.png";
+        private readonly string _defualtBlogImage = "/img/DefaultBlogImage.jpg";
         private readonly string _defualtCategoryImage = "/img/DefaultCategoryImage.png";
         
         
